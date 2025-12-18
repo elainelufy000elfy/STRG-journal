@@ -1,354 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>STRNG Journal</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STRNG Journal</title>
 
-  <style>
-    /* Global styling */
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      font-style: italic; /* Italic for all text */
-      font-size: 0.75rem; /* Smaller text */
-      letter-spacing: 0.02em;
-      color: #f5f5f5;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      text-align: center;
-      overflow: hidden;
-      background: linear-gradient(135deg, hsl(10, 20%, 35%), hsl(10, 30%, 50%));
-      background-size: 400% 400%;
-      transition: background 0.5s ease;
-    }
+<style>
+  body {
+    margin: 0;
+    background: #111;
+    color: white;
+    font-family: system-ui, sans-serif;
+    font-style: italic;
+  }
 
-    main {
-      max-width: 720px;
-      margin: auto;
-      padding: 2rem;
-      position: relative;
-    }
+  main {
+    max-width: 720px;
+    margin: auto;
+    padding: 2rem;
+  }
 
-    h1 {
-      font-weight: 300;
-      font-size: 2rem;
-    }
+  .thread {
+    width: 90%;
+    height: 2px;
+    margin: 8px auto;
+    background: linear-gradient(90deg, hsl(250,80%,60%), hsl(60,90%,60%));
+    cursor: pointer;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+  }
 
-    .caption {
-      opacity: 0.6;
-      margin-bottom: 1rem;
-      font-size: 0.8rem;
-    }
+  .thread:hover {
+    opacity: 1;
+    transform: scaleX(1.1);
+  }
 
-    .input-group {
-      margin-bottom: 1.5rem;
-    }
+  #detail-view {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    color: white;
+    padding: 2rem;
+    display: none;
+    z-index: 999;
+    overflow-y: auto;
+  }
 
-    label {
-      display: block;
-      margin-bottom: 0.4rem;
-      opacity: 0.8;
-    }
+  #detail-view h2 {
+    margin-top: 0;
+  }
 
-    input[type="range"],
-    textarea,
-    input[type="text"] {
-      width: 100%;
-      padding: 0.6rem;
-      font-style: italic; /* Italic for input fields */
-    }
+  #close-detail {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    cursor: pointer;
+    padding: 6px 12px;
+    background: white;
+    color: black;
+  }
 
-    textarea {
-      height: 90px;
-      background: rgba(255,255,255,0.08);
-      border: none;
-      color: white;
-    }
+  .gem {
+    font-size: 14px;
+    color: silver;
+    margin-left: 8px;
+  }
+</style>
 
-    button {
-      background: rgba(255,255,255,0.15);
-      border: none;
-      color: white;
-      padding: 0.6rem 1.2rem;
-      cursor: pointer;
-      margin-top: 1rem;
-    }
-
-    /* RUG */
-    #rug {
-      margin-top: 3rem;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(255,255,255,0.2);
-      min-height: 220px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    /* Bending Strings (Flexible with rotation) */
-    .thread {
-      height: 3px;
-      border-radius: 6px;
-      margin: 6px 0;
-      transition: opacity 1s, filter 1s;
-      animation: bendString 3s ease-in-out infinite;
-      cursor: pointer;
-      opacity: 0.8;
-      will-change: transform;
-      transition: all 0.5s ease;
-    }
-
-    @keyframes bendString {
-      0% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(5px) rotate(10deg); }
-      100% { transform: translateY(0) rotate(0deg); }
-    }
-
-    /* Color Merging with Purple and Yellow Tones */
-    .thread {
-      background: linear-gradient(90deg, hsl(250, 80%, 60%), hsl(60, 90%, 60%)); /* No green, more purple & yellow */
-    }
-
-    /* Goal Thread with Gems */
-    .goal-thread {
-      height: 10px;
-      position: relative;
-      transition: all 0.6s ease-in-out;
-    }
-
-    .gem {
-      position: absolute;
-      right: 10px;
-      top: -6px;
-      font-size: 14px;
-      color: silver;
-    }
-
-    /* Pinpoints and Entry Memory */
-    .pinpoint {
-      position: absolute;
-      border-radius: 50%;
-      background: #fff;
-      width: 8px;
-      height: 8px;
-      animation: floatPinpoints 5s ease-in-out infinite;
-    }
-
-    @keyframes floatPinpoints {
-      0% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-15px) scale(1.5); }
-      100% { transform: translateY(0) scale(1); }
-    }
-
-    /* Floating Caption for STRNG */
-    .floating-caption {
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.8rem;
-      font-style: italic;
-      color: #bbb;
-      opacity: 0.7;
-      z-index: 100;
-      animation: captionFadeIn 4s ease-in-out forwards;
-    }
-
-    @keyframes captionFadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 0.7; }
-    }
-
-    /* Galaxy View (Mouse at the top) */
-    body.galaxy-view {
-      background: black;
-      overflow: hidden;
-      color: white;
-    }
-
-    body.galaxy-view .thread {
-      transform: rotate(0deg);
-      animation: none;
-      height: 1px;
-      margin: 1px 0;
-      opacity: 0.4;
-    }
-
-  </style>
 </head>
 
 <body>
-  <main>
-    <h1>STRNG Journal</h1>
 
-    <p class="caption">
-      Each entry becomes a thread.  
-      Over time, these threads weave a record of care.
-    </p>
+<main>
+  <h1>STRNG Journal</h1>
 
-    <!-- INPUTS -->
-    <div class="input-group">
-      <label>How intense does today feel?</label>
-      <input type="range" id="intensity" min="0" max="100" value="50">
-    </div>
-
-    <div class="input-group">
-      <label>How pleasant was the day?</label>
-      <input type="range" id="pleasantness" min="0" max="100" value="50">
-    </div>
-
-    <div class="input-group">
-      <label>Reflection</label>
-      <textarea id="entry"></textarea>
-    </div>
-
-    <div class="input-group">
-      <label>Goal or habit (optional)</label>
-      <input type="text" id="goal" placeholder="Something you are trying to grow">
-    </div>
-
-    <button onclick="saveEntry()">Weave this entry</button>
-    <div id="rug"></div>
-    <div class="text-follow" id="text-follow"></div>
-    <p id="goal-caption" class="goal-caption"></p> <!-- Poetic caption will appear here -->
-  </main>
-
-  <!-- Floating Caption at the Bottom -->
-  <div class="floating-caption">
-    STRNG: String and Strong. Woven together over time.
+  <div>
+    <label>How intense does today feel?</label>
+    <input type="range" id="intensity">
   </div>
 
-  <script>
-    let goalMemory = {};
-    let entryCount = 0;
-    let clickedString = false;
+  <div>
+    <label>How pleasant was the day?</label>
+    <input type="range" id="pleasantness">
+  </div>
+  
+  <div>
+    <label>Reflection</label>
+    <textarea id="entryText"></textarea>
+  </div>
 
-    // Register the goal and track repetition
-    function registerGoal(goalText) {
-      if (!goalMemory[goalText]) {
-        goalMemory[goalText] = 1;
-      } else {
-        goalMemory[goalText]++;
-      }
+  <div>
+    <label>Goal (optional)</label>
+    <input type="text" id="goalInput">
+  </div>
+
+  <button onclick="createEntry()">Weave Entry</button>
+
+  <div id="rug"></div>
+</main>
+
+<div id="detail-view">
+  <div id="close-detail">CLOSE</div>
+  <h2 id="detail-date"></h2>
+  <div id="detail-text"></div>
+  <div id="detail-goal"></div>
+</div>
+
+
+<script>
+  let entries = [];
+
+  function createEntry() {
+    const intensity = document.getElementById('intensity').value;
+    const pleasant = document.getElementById('pleasantness').value;
+    const text = document.getElementById('entryText').value;
+    const goal = document.getElementById('goalInput').value;
+
+    // Create a unique entry object
+    const entry = {
+      id: Date.now(),
+      date: new Date().toLocaleString(),
+      intensity,
+      pleasant,
+      text,
+      goal,
+      color: `linear-gradient(90deg, hsl(${Math.random()*360},90%,60%), hsl(${Math.random()*360},90%,60%))`,
+    };
+
+    entries.push(entry);
+    renderThread(entry);
+    clearInputs();
+  }
+
+  function clearInputs() {
+    document.getElementById('entryText').value = "";
+    document.getElementById('goalInput').value = "";
+  }
+
+  function renderThread(entry) {
+    const rug = document.getElementById('rug');
+    const div = document.createElement('div');
+    div.className = 'thread';
+    div.style.background = entry.color;
+
+    // record id for click handling
+    div.dataset.entryId = entry.id;
+
+    if (entry.goal) {
+      const gem = document.createElement('span');
+      gem.className = 'gem';
+      gem.innerText = "◆";
+      div.appendChild(gem);
     }
 
-    // Save the entry with logic for threads and goal handling
-    function saveEntry() {
-      const intensity = +document.getElementById('intensity').value;
-      const pleasant = +document.getElementById('pleasantness').value;
-      const goal = document.getElementById('goal').value;
+    // clicking a thread shows details
+    div.addEventListener('click', () => showDetail(entry.id));
+    rug.appendChild(div);
+  }
 
-      // COLOR LOGIC (No Green, Purple & Yellow tones)
-      const hue = 180 + (pleasant - 50);
-      const saturation = 20 + intensity * 0.6;
-      const lightness = 20 + pleasant * 0.4;
+  function showDetail(entryId) {
+    const entry = entries.find(e => e.id == entryId);
+    if (!entry) return;
 
-      document.documentElement.style.setProperty('--base-hue', hue);
-      document.documentElement.style.setProperty('--saturation', saturation + '%');
-      document.documentElement.style.setProperty('--lightness', lightness + '%');
+    document.getElementById('detail-date').innerText = entry.date;
+    document.getElementById('detail-text').innerText = entry.text;
+    document.getElementById('detail-goal').innerText = entry.goal ? "Goal: " + entry.goal : "";
+    
+    document.getElementById('detail-view').style.display = 'block';
+  }
 
-      // THREAD CREATION
-      const thread = document.createElement('div');
-      thread.className = 'thread';
-      thread.style.background =
-        `linear-gradient(90deg,
-          hsl(${hue - 20}, ${saturation}%, ${lightness}%),
-          hsl(${hue + 20}, ${saturation}%, ${lightness}%)`;
+  document.getElementById('close-detail').addEventListener('click', () => {
+    document.getElementById('detail-view').style.display = 'none';
+  });
 
-      document.getElementById('rug').appendChild(thread);
-
-      // Make the thread clickable to view entry memory
-      thread.addEventListener('click', function () {
-        if (!clickedString) {
-          // Zoom-in effect and display the memory
-          this.classList.add('zoom-in');
-
-          // Display pinpoints floating around
-          const pinpoint = document.createElement('div');
-          pinpoint.className = 'pinpoint';
-          document.body.appendChild(pinpoint);
-
-          setTimeout(() => {
-            pinpoint.style.top = `${Math.random() * 80}vh`;
-            pinpoint.style.left = `${Math.random() * 80}vw`;
-          }, 100);
-
-          // Create text animation with the entry
-          const entryText = document.createElement('div');
-          entryText.className = 'floating-text';
-          entryText.innerText = "Strings are stronger when woven";
-          entryText.style.opacity = 0.7;
-          document.body.appendChild(entryText);
-
-          // Return to default view on click
-          setTimeout(() => {
-            this.classList.remove('zoom-in');
-            entryText.style.opacity = 0;
-          }, 1000);
-          
-          clickedString = true;
-        }
-      });
-
-      // GOAL LOGIC
-      if (goal) {
-        registerGoal(goal);  // Increment the goal count
-        entryCount++;  // Increment total entries
-
-        // Add goal thread with gem after every 10th entry
-        if (goalMemory[goal] % 10 === 0) {
-          const goalThread = document.createElement('div');
-          goalThread.className = 'goal-thread';
-          goalThread.innerHTML = `<span class="gem">◆</span>`;
-          document.getElementById('rug').appendChild(goalThread);
-          
-          // Display a poetic caption for the goal
-          const caption = document.getElementById('goal-caption');
-          caption.textContent = `Goal woven into the fabric of your journey, symbolized by a shining gem.`;
-        }
-      }
-
-      document.getElementById('entry').value = '';
-      checkGoalReminder();
-    }
-
-    // Mouse follow text interaction
-    const textFollow = document.getElementById('text-follow');
-
-    document.addEventListener('mousemove', function (e) {
-      textFollow.style.left = `${e.pageX + 20}px`;
-      textFollow.style.top = `${e.pageY + 20}px`;
-
-      // Set the text content near the mouse
-      textFollow.textContent = "Typing your reflection...";
-
-      // Make the text flow and bend like the strings
-      textFollow.style.transform = `rotate(${Math.sin(e.pageX / 100) * 5}deg)`;
-      textFollow.style.opacity = 0.9;
-    });
-
-    document.addEventListener('mouseleave', function () {
-      textFollow.style.opacity = 0; // Hide the text when the mouse leaves
-    });
-
-    // Function to check goal reminder
-    function checkGoalReminder() {
-      if (entryCount % 10 === 0) {
-        const goals = Object.keys(goalMemory);
-        if (goals.length > 0) {
-          const g = goals[0]; // MVP: first goal
-          const r = document.getElementById("goalReminder");
-          r.textContent = `Did we ${g} today?`;
-          r.classList.add("show");
-          setTimeout(() => r.classList.remove("show"), 3000);
-        }
-      }
-    }
-  </script>
+</script>
 
 </body>
 </html>
- 
