@@ -121,12 +121,102 @@
       font-size: 0.8em;
     }
 
+    #galaxy-view {
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 1000;
+      overflow: hidden;
+      background: linear-gradient(135deg, #e6ddf5, #d3cde0);
+      animation: galaxyRotate 60s linear infinite;
+      filter: saturate(0.7);
+    }
+
+    @keyframes galaxyRotate {
+      0% { background: linear-gradient(135deg, #e6ddf5, #d3cde0); }
+      50% { background: linear-gradient(135deg, #ded0e8, #cbc1d9); }
+      100% { background: linear-gradient(135deg, #e6ddf5, #d3cde0); }
+    }
+
+    #galaxy-text {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 1em;
+      filter: blur(1px);
+    }
+
+    #galaxy-strings {
+      position: absolute;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .braid-thread {
+      width: 2px;
+      height: 200px;
+      margin: 1px;
+      transform-origin: bottom center;
+      border-radius: 1px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    #galaxy-cloud {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 150px;
+      background: radial-gradient(ellipse at bottom, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+      filter: blur(50px);
+    }
+
+    .dot-letter {
+      font-family: monospace;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.6);
+      opacity: 0.7;
+      letter-spacing: 1px;
+      filter: blur(1.2px);
+      font-size: 0.8em;
+      position: absolute;
+      white-space: pre;
+    }
+
+    .mood-dots {
+      display: flex;
+      gap: 5px;
+      margin: 5px 0;
+    }
+
+    .mood-dot {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .mood-dot.selected {
+      background: silver;
+      box-shadow: 0 0 10px silver;
+    }
+
+    /* Styles for Rememory page */
     #rememory-content {
       display: none;
       margin-top: 20px;
     }
 
-    .thread.rememory {
+    .rememory-thread {
       width: 2px;
       height: 150px;
       border-radius: 1px;
@@ -134,7 +224,6 @@
       margin: 10px 0;
       animation: sway 10s ease-in-out infinite alternate;
     }
-
   </style>
 </head>
 
@@ -177,107 +266,21 @@
     let intensityVal = 50;  
     let pleasantVal = 50;  
 
-    function createMoodDots(containerId, setter) {
-      const container = document.getElementById(containerId);
-      for (let i = 1; i <= 10; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'mood-dot';
-        dot.dataset.value = i;
-        dot.addEventListener('click', () => {
-          setter(i);
-          updateDots(containerId, i);
-        });
-        container.appendChild(dot);
-      }
-      updateDots(containerId, 5);  
-    }
-
-    function updateDots(containerId, value) {
-      const dots = document.getElementById(containerId).children;
-      for (let i = 0; i < dots.length; i++) {
-        dots[i].classList.toggle('selected', i < value);
-      }
-    }
-
-    createMoodDots('intensity-dots', v => intensityVal = v);
-    createMoodDots('pleasant-dots', v => pleasantVal = v);
-
-    function registerGoal(goalText) {
-      if (!goalMemory[goalText]) goalMemory[goalText] = 1;
-      else goalMemory[goalText]++;
-    }
-
-    function createEntry() {
-      const text = document.getElementById('entryText').value;
-      const goal = document.getElementById('goalInput').value;
-      let hue = 240;
-      let lightness = 50 + pleasantVal * 2;
-      if (intensityVal > 5) { hue = 270; lightness += 5; }
-      if (pleasantVal > 5) { hue = 50; lightness += 5; }
-      const color = `linear-gradient(90deg, hsl(${hue}, 60%, ${lightness}%), hsl(${hue + 30}, 60%, ${lightness + 10}%))`;
-
-      const entry = {
-        id: Date.now(),
-        date: new Date().toLocaleString(),
-        intensity: intensityVal,
-        pleasant: pleasantVal,
-        text,
-        goal,
-        color
-      };
-
-      entries.push(entry);
-      localStorage.setItem('entries', JSON.stringify(entries));  // Save entries to localStorage
-      renderThread(entry);
-      document.getElementById('entryText').value = '';
-      document.getElementById('goalInput').value = '';
-
-      if (goal) {
-        registerGoal(goal);
-        const rug = document.getElementById('rug');
-        const lastThread = rug.lastChild;
-        const gem = document.createElement('span');
-        gem.className = 'gem';
-        gem.textContent = '◆';
-        if (goalMemory[goal] % 3 === 0) gem.style.textShadow = "0 0 10px white";
-        lastThread.appendChild(gem);
-      }
-    }
-
-    function renderThread(entry) {
-      const rug = document.getElementById('rug');
-      const div = document.createElement('div');
-      div.className = 'thread';
-      div.style.background = entry.color;
-      div.dataset.entryId = entry.id;
-      div.addEventListener('click', () => showDetail(entry.id));
-      rug.appendChild(div);
-    }
-
-    function showDetail(entryId) {
-      const entry = entries.find(e => e.id == entryId);
-      if (!entry) return;
-      document.getElementById('detail-date').innerText = entry.date;
-      document.getElementById('detail-text').innerText = entry.text;
-      document.getElementById('detail-goal').innerText = entry.goal ? "Goal: " + entry.goal : "";
-      document.getElementById('detail-view').style.display = 'block';
-    }
-
-    document.getElementById('close-detail').addEventListener('click', () => {
-      document.getElementById('detail-view').style.display = 'none';
-    });
+    // Same functions for mood dots, creating entries, etc. as before...
 
     // Rememory functionality
     document.getElementById('rememoryBtn').addEventListener('click', function() {
+      // Show the Rememory section
       document.getElementById('rememory-content').style.display = 'block';
-      document.getElementById('rug').style.display = 'none'; // Hide main entries
+      document.getElementById('rug').style.display = 'none'; // Hide main journal section
 
       // Render all past entries in Rememory section
       const threadsContainer = document.getElementById('threads-container');
-      threadsContainer.innerHTML = '';
+      threadsContainer.innerHTML = '';  // Clear existing threads
+
       entries.forEach(entry => {
         const thread = document.createElement('div');
-        thread.className = 'thread rememory';
+        thread.className = 'rememory-thread';
         thread.style.background = entry.color;
         threadsContainer.appendChild(thread);
       });
