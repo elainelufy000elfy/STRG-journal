@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Young You Journal</title>
+  <title>STRNG Journal</title>
 
   <style>
     /* Global styling */
@@ -14,7 +14,6 @@
       font-size: 0.75rem; /* Smaller text */
       letter-spacing: 0.02em;
       color: #f5f5f5;
-      background: #111;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -22,12 +21,30 @@
       flex-direction: column;
       text-align: center;
       overflow: hidden;
+      animation: backgroundShift 10s ease-in-out infinite;
+      background: linear-gradient(135deg, hsl(10, 20%, 35%), hsl(10, 30%, 50%));
+      background-size: 400% 400%;
+      transition: background 0.5s ease;
+    }
+
+    @keyframes backgroundShift {
+      0% {
+        background: linear-gradient(135deg, hsl(10, 20%, 35%), hsl(10, 30%, 50%));
+      }
+      50% {
+        background: linear-gradient(135deg, hsl(10, 20%, 50%), hsl(10, 40%, 60%));
+      }
+      100% {
+        background: linear-gradient(135deg, hsl(10, 20%, 35%), hsl(10, 30%, 50%));
+      }
     }
 
     main {
       max-width: 720px;
       margin: auto;
       padding: 2rem;
+      position: relative;
+      z-index: 1;
     }
 
     h1 {
@@ -87,11 +104,14 @@
 
     /* Bending Strings (Flexible with rotation) */
     .thread {
-      height: 6px;
+      height: 3px;
       border-radius: 6px;
       margin: 6px 0;
       transition: opacity 1s, filter 1s;
       animation: bendString 3s ease-in-out infinite;
+      cursor: pointer;
+      opacity: 0.8;
+      will-change: transform;
     }
 
     @keyframes bendString {
@@ -155,12 +175,68 @@
       margin-top: 10px;
       opacity: 0.7;
     }
+
+    /* Floating Caption for STRNG */
+    .floating-caption {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      font-style: italic;
+      color: #bbb;
+      opacity: 0.7;
+      z-index: 100;
+      animation: captionFadeIn 4s ease-in-out forwards;
+    }
+
+    @keyframes captionFadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 0.7; }
+    }
+
+    /* Zoom-In/Out Animation */
+    .zoom-in {
+      transform: scale(2);
+      transition: transform 1s ease-in-out;
+    }
+
+    /* Pinpoints and Entry Memory */
+    .pinpoint {
+      position: absolute;
+      border-radius: 50%;
+      background: #fff;
+      width: 8px;
+      height: 8px;
+      animation: floatPinpoints 5s ease-in-out infinite;
+    }
+
+    @keyframes floatPinpoints {
+      0% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-15px) scale(1.5); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    /* Galaxy View (Mouse at the top) */
+    body.galaxy-view {
+      background: black;
+      overflow: hidden;
+      color: white;
+    }
+
+    body.galaxy-view .thread {
+      transform: rotate(0deg);
+      animation: none;
+      height: 1px;
+      margin: 1px 0;
+      opacity: 0.4;
+    }
   </style>
 </head>
 
 <body>
   <main>
-    <h1>Young You Journal</h1>
+    <h1>STRNG Journal</h1>
 
     <p class="caption">
       Each entry becomes a thread.  
@@ -194,9 +270,15 @@
     <p id="goal-caption" class="goal-caption"></p> <!-- Poetic caption will appear here -->
   </main>
 
+  <!-- Floating Caption at the Bottom -->
+  <div class="floating-caption">
+    STRNG: String and Strong. Woven together over time.
+  </div>
+
   <script>
     let goalMemory = {};
     let entryCount = 0;
+    let clickedString = false;
 
     // Register the goal and track repetition
     function registerGoal(goalText) {
@@ -231,6 +313,39 @@
           hsl(${hue + 20}, ${saturation}%, ${lightness}%)`;
 
       document.getElementById('rug').appendChild(thread);
+
+      // Make the thread clickable to view entry memory
+      thread.addEventListener('click', function () {
+        if (!clickedString) {
+          // Zoom-in effect and display the memory
+          this.classList.add('zoom-in');
+
+          // Display pinpoints floating around
+          const pinpoint = document.createElement('div');
+          pinpoint.className = 'pinpoint';
+          document.body.appendChild(pinpoint);
+
+          setTimeout(() => {
+            pinpoint.style.top = `${Math.random() * 80}vh`;
+            pinpoint.style.left = `${Math.random() * 80}vw`;
+          }, 100);
+
+          // Create text animation with the entry
+          const entryText = document.createElement('div');
+          entryText.className = 'floating-text';
+          entryText.innerText = "Strings are stronger when woven";
+          entryText.style.opacity = 0.7;
+          document.body.appendChild(entryText);
+
+          // Return to default view on click
+          setTimeout(() => {
+            this.classList.remove('zoom-in');
+            entryText.style.opacity = 0;
+          }, 1000);
+          
+          clickedString = true;
+        }
+      });
 
       // GOAL LOGIC
       if (goal) {
