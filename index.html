@@ -209,6 +209,7 @@
       background: silver;
       box-shadow: 0 0 10px silver;
     }
+
   </style>
 </head>
 <body>
@@ -348,39 +349,25 @@
     });
 
     document.getElementById('rememoryBtn').addEventListener('click', function() {
-      // Change Background Color (Mood Indicator)
-      const hue = 180 + (pleasantVal - 50);
-      const saturation = 20 + intensityVal * 0.6;
-      const lightness = 20 + pleasantVal * 0.4;
+      // Show all saved entries in the overlay
+      const galaxyView = document.getElementById('galaxy-view');
+      galaxyView.style.display = 'block';
 
-      document.documentElement.style.setProperty('--base-hue', hue);
-      document.documentElement.style.setProperty('--saturation', saturation + '%');
-      document.documentElement.style.setProperty('--lightness', lightness + '%');
+      const galaxyStrings = document.getElementById('galaxy-strings');
+      galaxyStrings.innerHTML = '';  // Clear any previous content
 
-      // Add a new thread to the rug based on the current mood
-      const thread = document.createElement('div');
-      thread.className = 'thread';
-      thread.style.background = `linear-gradient(90deg, hsl(${hue - 20}, ${saturation}%, ${lightness}%), hsl(${hue + 20}, ${saturation}%, ${lightness}%))`;
+      // Render each string (entry) as a braid thread
+      entries.forEach(entry => {
+        const braidThread = document.createElement('div');
+        braidThread.className = 'braid-thread';
+        braidThread.style.background = entry.color;
+        galaxyStrings.appendChild(braidThread);
 
-      if (intensityVal > 80) thread.classList.add('burn');
-      else if (pleasantVal > 60) thread.classList.add('glow');
-      else thread.classList.add('dim');
-
-      // Add the new thread to the rug
-      document.getElementById('rug').appendChild(thread);
-
-      // Handle goal thread (Gem)
-      const goal = document.getElementById('goalInput').value;
-      if (goal) {
-        goalMemory[goal] = (goalMemory[goal] || 0) + 1;
-
-        if (goalMemory[goal] % 10 === 0) {
-          const goalThread = document.createElement('div');
-          goalThread.className = 'goal-thread';
-          goalThread.innerHTML = `<span class="gem">◆</span>`;
-          document.getElementById('rug').appendChild(goalThread);
+        // Add glowing effect if the entry has a goal
+        if (entry.goal) {
+          braidThread.style.boxShadow = '0 0 10px silver';
         }
-      }
+      });
     });
   </script>
 </body>
