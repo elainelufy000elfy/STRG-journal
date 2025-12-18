@@ -130,6 +130,7 @@
       background: linear-gradient(135deg, #e6ddf5, #d3cde0);
       animation: galaxyRotate 60s linear infinite;
       filter: saturate(0.7);
+      transition: all 0.5s ease;
     }
 
     @keyframes galaxyRotate {
@@ -154,8 +155,19 @@
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       justify-content: center;
+      gap: 2px;
+      animation: moveStrings 10s linear infinite;
+    }
+
+    @keyframes moveStrings {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(100vw);
+      }
     }
 
     .braid-thread {
@@ -166,6 +178,7 @@
       border-radius: 1px;
       position: relative;
       cursor: pointer;
+      box-shadow: 30px 30px 30px rgba(0, 0, 0, 0.5);
     }
 
     #galaxy-cloud {
@@ -349,14 +362,14 @@
     });
 
     document.getElementById('rememoryBtn').addEventListener('click', function() {
-      // Show all saved entries in the overlay
+      // Zoom-in Effect for "Rememory" Button
       const galaxyView = document.getElementById('galaxy-view');
       galaxyView.style.display = 'block';
 
+      // Create threads with movement and golden sparks
       const galaxyStrings = document.getElementById('galaxy-strings');
       galaxyStrings.innerHTML = '';  // Clear any previous content
 
-      // Render each string (entry) as a braid thread
       entries.forEach(entry => {
         const braidThread = document.createElement('div');
         braidThread.className = 'braid-thread';
@@ -365,7 +378,7 @@
 
         // Add glowing effect if the entry has a goal
         if (entry.goal) {
-          braidThread.style.boxShadow = '0 0 10px silver';
+          braidThread.style.boxShadow = '0 0 10px gold';
         }
       });
     });
