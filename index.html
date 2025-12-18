@@ -481,6 +481,42 @@
         renderGalaxy();
       }
     });
+    document.getElementById('rememoryBtn').addEventListener('click', function() {
+  // Change Background Color (Mood Indicator)
+  const hue = 180 + (pleasantVal - 50);
+  const saturation = 20 + intensityVal * 0.6;
+  const lightness = 20 + pleasantVal * 0.4;
+
+  document.documentElement.style.setProperty('--base-hue', hue);
+  document.documentElement.style.setProperty('--saturation', saturation + '%');
+  document.documentElement.style.setProperty('--lightness', lightness + '%');
+
+  // Add a new thread to the rug based on the current mood
+  const thread = document.createElement('div');
+  thread.className = 'thread';
+  thread.style.background = `linear-gradient(90deg, hsl(${hue - 20}, ${saturation}%, ${lightness}%), hsl(${hue + 20}, ${saturation}%, ${lightness}%))`;
+
+  if (intensityVal > 80) thread.classList.add('burn');
+  else if (pleasantVal > 60) thread.classList.add('glow');
+  else thread.classList.add('dim');
+
+  // Add the new thread to the rug
+  document.getElementById('rug').appendChild(thread);
+
+  // Handle goal thread (Gem)
+  const goal = document.getElementById('goalInput').value;
+  if (goal) {
+    goalMemory[goal] = (goalMemory[goal] || 0) + 1;
+
+    if (goalMemory[goal] % 10 === 0) {
+      const goalThread = document.createElement('div');
+      goalThread.className = 'goal-thread';
+      goalThread.innerHTML = `<span class="gem">◆</span>`;
+      document.getElementById('rug').appendChild(goalThread);
+    }
+  }
+});
+
   </script>
 </body>
 </html>
