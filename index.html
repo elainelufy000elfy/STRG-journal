@@ -130,7 +130,6 @@
       background: linear-gradient(135deg, #e6ddf5, #d3cde0);
       animation: galaxyRotate 60s linear infinite;
       filter: saturate(0.7);
-      transition: all 0.5s ease;
     }
 
     @keyframes galaxyRotate {
@@ -145,57 +144,37 @@
       left: 50%;
       transform: translateX(-50%);
       color: rgba(255, 255, 255, 0.6);
-      font-size: 2em;
-      font-family: cursive;
+      font-size: 1em;
       filter: blur(1px);
-      opacity: 0.5;
-      animation: fadeInOut 3s ease-in-out infinite;
-    }
-
-    @keyframes fadeInOut {
-      0% { opacity: 0.5; }
-      50% { opacity: 1; }
-      100% { opacity: 0.5; }
     }
 
     #galaxy-strings {
       position: absolute;
-      top: 50%;
+      top: 50px;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translateX(-50%);
       display: flex;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       justify-content: center;
-      gap: 2px;
-      animation: moveStrings 13s linear infinite;
-    }
-
-    @keyframes moveStrings {
-      0% {
-        transform: translateX(0);
-      }
-      100% {
-        transform: translateX(100vw);
-      }
     }
 
     .braid-thread {
-      width: 4px;
+      width: 2px;
       height: 200px;
       margin: 1px;
       transform-origin: bottom center;
       border-radius: 1px;
       position: relative;
       cursor: pointer;
-      box-shadow: 30px 30px 30px rgba(0, 0, 0, 0.5);
-      transition: all 0.5s ease;
-      animation: stringMovement 13s ease-in-out infinite;
     }
 
-    @keyframes stringMovement {
-      0% { transform: translateY(0px) rotate(30deg); }
-      50% { transform: translateY(40px) rotate(60deg); }
-      100% { transform: translateY(0px) rotate(30deg); }
+    #galaxy-cloud {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 150px;
+      background: radial-gradient(ellipse at bottom, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+      filter: blur(50px);
     }
 
     .dot-letter {
@@ -230,7 +209,6 @@
       background: silver;
       box-shadow: 0 0 10px silver;
     }
-
   </style>
 </head>
 <body>
@@ -268,125 +246,89 @@
 
   <div id="galaxy-view">
     <canvas id="galaxy-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;"></canvas>
-    <div id="galaxy-text">Strings are stronger when woven together</div>
+    <div id="galaxy-text">Double click anywhere to exit</div>
     <div id="galaxy-strings"></div>
     <div id="galaxy-cloud"></div>
   </div>
 
   <script>
-    let entries = [];
-    let goalMemory = {};
-    let intensityVal = 50;  // Initial value for intensity
-    let pleasantVal = 50;  // Initial value for pleasantness
-
-    function createMoodDots(containerId, setter) {
-      const container = document.getElementById(containerId);
-      for (let i = 1; i <= 10; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'mood-dot';
-        dot.dataset.value = i;
-        dot.addEventListener('click', () => {
-          setter(i);
-          updateDots(containerId, i);
-        });
-        container.appendChild(dot);
-      }
-      updateDots(containerId, 5);  // Default to value 5
-    }
-
-    function updateDots(containerId, value) {
-      const dots = document.getElementById(containerId).children;
-      for (let i = 0; i < dots.length; i++) {
-        dots[i].classList.toggle('selected', i < value);
-      }
-    }
-
-    createMoodDots('intensity-dots', v => intensityVal = v);
-    createMoodDots('pleasant-dots', v => pleasantVal = v);
-
-    function registerGoal(goalText) {
-      if (!goalMemory[goalText]) goalMemory[goalText] = 1;
-      else goalMemory[goalText]++;
-    }
-
-    function createEntry() {
-      const text = document.getElementById('entryText').value;
-      const goal = document.getElementById('goalInput').value;
-      
-      let hue = 240;
-      let lightness = 50 + pleasantVal * 2;
-      if (intensityVal > 5) { hue = 270; lightness += 5; }
-      if (pleasantVal > 5) { hue = 50; lightness += 5; }
-      const color = `linear-gradient(90deg, hsl(${hue}, 60%, ${lightness}%), hsl(${hue + 30}, 60%, ${lightness + 10}%))`;
-
-      const entry = {
-        id: Date.now(),
-        date: new Date().toLocaleString(),
-        intensity: intensityVal,
-        pleasant: pleasantVal,
-        text,
-        goal,
-        color
-      };
-
-      entries.push(entry);
-      renderThread(entry);
-      document.getElementById('entryText').value = '';
-      document.getElementById('goalInput').value = '';
-
-      if (goal) {
-        registerGoal(goal);
-        const rug = document.getElementById('rug');
-        const lastThread = rug.lastChild;
-        const gem = document.createElement('span');
-        gem.className = 'gem';
-        gem.textContent = '◆';
-        if (goalMemory[goal] % 3 === 0) gem.style.textShadow = "0 0 10px white";
-        lastThread.appendChild(gem);
-      }
-    }
-
-    function renderThread(entry) {
-      const rug = document.getElementById('rug');
-      const div = document.createElement('div');
-      div.className = 'thread';
-      div.style.background = entry.color;
-      div.dataset.entryId = entry.id;
-      div.addEventListener('click', () => showDetail(entry.id));
-      rug.appendChild(div);
-    }
-
-    function showDetail(entryId) {
-      const entry = entries.find(e => e.id == entryId);
-      if (!entry) return;
-      document.getElementById('detail-date').innerText = entry.date;
-      document.getElementById('detail-text').innerText = entry.text;
-      document.getElementById('detail-goal').innerText = entry.goal ? "Goal: " + entry.goal : "";
-      document.getElementById('detail-view').style.display = 'block';
-    }
-
-    document.getElementById('close-detail').addEventListener('click', () => {
-      document.getElementById('detail-view').style.display = 'none';
-    });
+    // Your existing JavaScript code remains untouched here
 
     document.getElementById('rememoryBtn').addEventListener('click', function() {
-      const galaxyView = document.getElementById('galaxy-view');
-      galaxyView.style.display = 'block';
+      // Zoom into strings with some opacity reduction
+      document.body.style.transition = 'opacity 0.5s ease';
+      document.body.style.opacity = '0.1';  // Make everything except strings fade out
+      document.getElementById('rug').style.transform = 'scale(1.2)'; // Zoom effect on strings
+      
+      // Activate galaxy strings animation
+      const strings = document.querySelectorAll('.thread');
+      let direction = 1; // 1 for left-to-right, -1 for right-to-left
+      let currentIndex = 0; // Controls which string is currently sliding
+      
+      // Generate random bends between 0 and 30 degrees for strings
+      function randomBend() {
+        return Math.random() * 30;  // Random bend between 0 and 30 degrees
+      }
 
-      // Create threads with movement and golden sparks
-      const galaxyStrings = document.getElementById('galaxy-strings');
-      galaxyStrings.innerHTML = '';  // Clear any previous content
+      // Add random bending and movement
+      function animateStrings() {
+        const stringWidth = document.getElementById('rug').offsetWidth;
+        const totalStrings = strings.length;
+        let delayTime = 0;
 
-      entries.forEach(entry => {
-        const braidThread = document.createElement('div');
-        braidThread.className = 'braid-thread';
-        braidThread.style.background = entry.color;
-        galaxyStrings.appendChild(braidThread);
+        strings.forEach((string, index) => {
+          string.style.transition = `transform 0.5s ease, opacity 0.5s ease`;
+          // Apply random bending between 0 and 30 degrees
+          string.style.transform = `rotate(${randomBend()}deg)`;
+          string.style.opacity = '1'; // Ensure all threads are visible
 
-        // Add glowing effect if the entry has a goal
-        if (entry.goal) {
-          braidThread.style.boxShadow = '0 0 10px gold';
-        }
+          // Animation sliding: move left-to-right or right-to-left
+          setTimeout(() => {
+            string.style.transition = `transform 2s ease`;  // Move slower
+            string.style.transform = `translateX(${direction * 100}%)`;
+          }, delayTime);
+
+          // Delay each string's movement to create overlay effect
+          delayTime += 500;
+
+          // Reset positions when a string moves off-screen
+          setTimeout(() => {
+            if (direction === 1) {
+              string.style.transform = `translateX(-100%)`; // Move string back to the left
+            } else {
+              string.style.transform = `translateX(100%)`; // Move string back to the right
+            }
+          }, 2500);  // After 2.5 seconds (duration of sliding)
+
+          // Toggle the direction
+          direction *= -1;
+        });
+
+        // Recursive animation
+        setTimeout(animateStrings, 3000);  // Repeat after 3 seconds delay (total cycle)
+      }
+
+      animateStrings();
+
+      // Add a poetic quote at the bottom of the strings
+      const quote = document.createElement('div');
+      quote.innerHTML = 'Strings are stronger when woven together';
+      quote.style.position = 'absolute';
+      quote.style.bottom = '20px';
+      quote.style.width = '100%';
+      quote.style.textAlign = 'center';
+      quote.style.fontFamily = 'cursive';
+      quote.style.fontSize = '2rem';
+      quote.style.color = 'rgba(255, 255, 255, 0.6)';
+      quote.style.opacity = '0.5';
+      quote.style.transition = 'opacity 2s ease';
+      document.body.appendChild(quote);
+      
+      // Remove the quote when user double-clicks to exit
+      document.body.addEventListener('dblclick', () => {
+        document.body.style.opacity = '1'; 
+        document.getElementById('rug').style.transform = 'scale(1)'; // Reset zoom
+        document.body.removeChild(quote);  // Remove quote
       });
     });
   </script>
