@@ -145,20 +145,29 @@
       left: 50%;
       transform: translateX(-50%);
       color: rgba(255, 255, 255, 0.6);
-      font-size: 1em;
+      font-size: 2em;
+      font-family: cursive;
       filter: blur(1px);
+      opacity: 0.5;
+      animation: fadeInOut 3s ease-in-out infinite;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
     }
 
     #galaxy-strings {
       position: absolute;
-      top: 50px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
       display: flex;
       flex-wrap: nowrap;
       justify-content: center;
       gap: 2px;
-      animation: moveStrings 10s linear infinite;
+      animation: moveStrings 13s linear infinite;
     }
 
     @keyframes moveStrings {
@@ -171,7 +180,7 @@
     }
 
     .braid-thread {
-      width: 2px;
+      width: 4px;
       height: 200px;
       margin: 1px;
       transform-origin: bottom center;
@@ -179,15 +188,14 @@
       position: relative;
       cursor: pointer;
       box-shadow: 30px 30px 30px rgba(0, 0, 0, 0.5);
+      transition: all 0.5s ease;
+      animation: stringMovement 13s ease-in-out infinite;
     }
 
-    #galaxy-cloud {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 150px;
-      background: radial-gradient(ellipse at bottom, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
-      filter: blur(50px);
+    @keyframes stringMovement {
+      0% { transform: translateY(0px) rotate(30deg); }
+      50% { transform: translateY(40px) rotate(60deg); }
+      100% { transform: translateY(0px) rotate(30deg); }
     }
 
     .dot-letter {
@@ -260,7 +268,7 @@
 
   <div id="galaxy-view">
     <canvas id="galaxy-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;"></canvas>
-    <div id="galaxy-text">Double click anywhere to exit</div>
+    <div id="galaxy-text">Strings are stronger when woven together</div>
     <div id="galaxy-strings"></div>
     <div id="galaxy-cloud"></div>
   </div>
@@ -362,7 +370,6 @@
     });
 
     document.getElementById('rememoryBtn').addEventListener('click', function() {
-      // Zoom-in Effect for "Rememory" Button
       const galaxyView = document.getElementById('galaxy-view');
       galaxyView.style.display = 'block';
 
