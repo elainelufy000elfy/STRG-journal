@@ -132,12 +132,14 @@
       left: 50%;
       transform: translateX(-50%);
       color: #fff;
-      font-size: 1rem;
+      font-size: 1.2rem;
       white-space: pre-wrap;
       line-height: 1.5;
-      opacity: 0.8;
+      opacity: 0.9;
       filter: blur(1px);
+      z-index: 10; /* Make sure it appears above other elements */
       animation: floatText 10s linear infinite, rotateText 30s linear infinite;
+      text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8), 0px 0px 20px rgba(255, 255, 255, 0.6);
     }
 
     @keyframes floatText {
