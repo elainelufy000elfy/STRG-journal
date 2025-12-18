@@ -61,19 +61,6 @@
       font-size: 0.8em;
     }
 
-    #rug-container {
-      width: 100%;
-      height: 300px;
-      overflow: auto;
-      position: relative;
-      border: 1px solid #ccc;
-      padding: 20px;
-      box-sizing: border-box;
-      transform-origin: 0 0;
-      cursor: grab;
-      transition: transform 0.3s ease;
-    }
-
     #rug {
       display: flex;
       align-items: flex-end;
@@ -110,50 +97,118 @@
       transition: all 0.5s ease;
     }
 
-    /* For mobile layout */
-    @media (max-width: 768px) {
-      body {
-        font-size: 0.8rem;
-        padding: 10px;
-      }
-      #rememoryBtn {
-        font-size: 0.7em;
-        padding: 6px 10px;
-      }
-      main {
-        font-size: 0.7em;
-      }
+    #detail-view {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      color: rgba(255, 255, 255, 0.7);
+      padding: 2rem;
+      display: none;
+      z-index: 999;
+      overflow-y: auto;
+      font-size: 0.8em;
+      filter: blur(0.5px);
     }
 
-    /* Floating text section */
-    .floating-text {
+    #close-detail {
       position: absolute;
-      top: 80%;
+      top: 12px;
+      right: 12px;
+      cursor: pointer;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.7);
+      color: #111;
+      font-size: 0.8em;
+    }
+
+    #galaxy-view {
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 1000;
+      overflow: hidden;
+      background: linear-gradient(135deg, #e6ddf5, #d3cde0);
+      animation: galaxyRotate 60s linear infinite;
+      filter: saturate(0.7);
+    }
+
+    @keyframes galaxyRotate {
+      0% { background: linear-gradient(135deg, #e6ddf5, #d3cde0); }
+      50% { background: linear-gradient(135deg, #ded0e8, #cbc1d9); }
+      100% { background: linear-gradient(135deg, #e6ddf5, #d3cde0); }
+    }
+
+    #galaxy-text {
+      position: absolute;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      color: #fff;
-      font-size: 1.2rem;
-      white-space: pre-wrap;
-      line-height: 1.5;
-      opacity: 0.9;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 1em;
       filter: blur(1px);
-      z-index: 10; /* Make sure it appears above other elements */
-      animation: floatText 10s linear infinite, rotateText 30s linear infinite;
-      text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8), 0px 0px 20px rgba(255, 255, 255, 0.6);
     }
 
-    @keyframes floatText {
-      0% { transform: translateY(0) translateX(-50%); }
-      50% { transform: translateY(-10px) translateX(-50%); }
-      100% { transform: translateY(0) translateX(-50%); }
+    #galaxy-strings {
+      position: absolute;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
-    @keyframes rotateText {
-      0% { transform: rotate(0deg); }
-      50% { transform: rotate(180deg); }
-      100% { transform: rotate(360deg); }
+    .braid-thread {
+      width: 2px;
+      height: 200px;
+      margin: 1px;
+      transform-origin: bottom center;
+      border-radius: 1px;
+      position: relative;
+      cursor: pointer;
     }
 
+    #galaxy-cloud {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 150px;
+      background: radial-gradient(ellipse at bottom, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+      filter: blur(50px);
+    }
+
+    .dot-letter {
+      font-family: monospace;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.6);
+      opacity: 0.7;
+      letter-spacing: 1px;
+      filter: blur(1.2px);
+      font-size: 0.8em;
+      position: absolute;
+      white-space: pre;
+    }
+
+    .mood-dots {
+      display: flex;
+      gap: 5px;
+      margin: 5px 0;
+    }
+
+    .mood-dot {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .mood-dot.selected {
+      background: silver;
+      box-shadow: 0 0 10px silver;
+    }
   </style>
 </head>
 
@@ -181,9 +236,7 @@
       <input type="text" id="goalInput">
     </div>
     <button onclick="createEntry()">Weave Entry</button>
-    <div id="rug-container">
-      <div id="rug"></div>
-    </div>
+    <div id="rug"></div>
   </main>
 
   <div id="detail-view">
@@ -206,7 +259,6 @@
     let intensityVal = 5;
     let pleasantVal = 5;
 
-    // Creating mood dots for intensity and pleasantness
     function createMoodDots(containerId, setter) {
       const container = document.getElementById(containerId);
       for (let i = 1; i <= 10; i++) {
@@ -232,17 +284,15 @@
     createMoodDots('intensity-dots', v => intensityVal = v);
     createMoodDots('pleasant-dots', v => pleasantVal = v);
 
-    // Goal registration
     function registerGoal(goalText) {
       if (!goalMemory[goalText]) goalMemory[goalText] = 1;
       else goalMemory[goalText]++;
     }
 
-    // Creating the entry
     function createEntry() {
       const text = document.getElementById('entryText').value;
       const goal = document.getElementById('goalInput').value;
-
+      
       let hue = 240;
       let lightness = 50 + pleasantVal * 2;
       if (intensityVal > 5) { hue = 270; lightness += 5; }
@@ -264,13 +314,6 @@
       document.getElementById('entryText').value = '';
       document.getElementById('goalInput').value = '';
 
-      // Floating text animation for the message
-      const floatingText = document.createElement('div');
-      floatingText.className = 'floating-text';
-      floatingText.textContent = entry.text;
-      document.body.appendChild(floatingText);
-
-      // Handling goals and gem animation
       if (goal) {
         registerGoal(goal);
         const rug = document.getElementById('rug');
@@ -283,7 +326,6 @@
       }
     }
 
-    // Rendering the thread
     function renderThread(entry) {
       const rug = document.getElementById('rug');
       const div = document.createElement('div');
@@ -294,7 +336,6 @@
       rug.appendChild(div);
     }
 
-    // Show entry details in the view
     function showDetail(entryId) {
       const entry = entries.find(e => e.id == entryId);
       if (!entry) return;
@@ -308,7 +349,6 @@
       document.getElementById('detail-view').style.display = 'none';
     });
 
-    // Title petal animation
     const titleLetters = document.querySelectorAll('#title span');
     function animateTitle() {
       titleLetters.forEach((l, i) => {
@@ -319,6 +359,128 @@
       }, 10000);
     }
     setInterval(animateTitle, 10000);
+
+    const galaxyBtn = document.getElementById('rememoryBtn');
+    const galaxyOverlay = document.getElementById('galaxy-view');
+    const galaxyStrings = document.getElementById('galaxy-strings');
+    galaxyBtn.addEventListener('click', () => {
+      galaxyOverlay.style.display = 'block';
+      galaxyStrings.innerHTML = '';
+      const layers = 3;
+      for (let l = 0; l < layers; l++) {
+        entries.forEach(entry => {
+          createGalaxyThread(entry, l, layers);
+        });
+      }
+    });
+
+    galaxyOverlay.addEventListener('dblclick', () => {
+      galaxyOverlay.style.display = 'none';
+    });
+
+    // Galaxy thread creation function
+    function createGalaxyThread(entry, layerIndex, totalLayers) {
+      const braid = document.createElement('div');
+      braid.className = 'braid-thread';
+      braid.style.position = 'absolute';
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      braid.style.bottom = `${20 + layerIndex * 50}px`;
+      braid.style.left = `${vw / 2 + (Math.random() * vw / 4 - vw / 8)}px`;
+
+      // Create scalable canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = vw * 0.4; 
+      canvas.height = vh * 0.2;
+      braid.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+
+      // Prepare points for braid curve
+      const points = [];
+      const len = Math.min(entry.text.length, 30);
+      for (let i = 0; i < len; i++) {
+        points.push({ x: (canvas.width / len) * i, y: canvas.height / 2 + 20 * Math.sin(i * 0.3 + Math.random() * 2 * Math.PI) });
+      }
+
+      // Draw animated braid
+      function drawLayer() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+        grad.addColorStop(0, entry.color.split(',')[0] + ')');
+        grad.addColorStop(1, entry.color.split(',')[1] + ')');
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+          const cpX = (points[i - 1].x + points[i].x) / 2;
+          const cpY = (points[i - 1].y + points[i].y) / 2;
+          ctx.quadraticCurveTo(points[i - 1].x, points[i - 1].y, cpX, cpY);
+        }
+        ctx.stroke();
+        points.forEach(p => { p.y += Math.sin(Date.now() / 1000 + Math.random() * 10) * 0.15; });
+        requestAnimationFrame(drawLayer);
+      }
+      drawLayer();
+
+      // Dot-letter effect
+      const letters = entry.text.split('');
+      letters.forEach((c, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'dot-letter';
+        dot.innerText = '•';
+        dot.style.left = (i * 18) + 'px';
+        dot.style.bottom = '0px';
+        dot.dataset.offset = Math.random() * 2 * Math.PI;
+        braid.appendChild(dot);
+      });
+
+      // Dot-letter animation
+      function animateDotsLayer() {
+        const t = Date.now() / 1000;
+        const dots = braid.querySelectorAll('.dot-letter');
+        for (let i = 0; i < dots.length; i++) {
+          const offset = parseFloat(dots[i].dataset.offset);
+          dots[i].style.bottom = (5 * Math.sin(t + offset)) + 'px';
+        }
+        requestAnimationFrame(animateDotsLayer);
+      }
+      animateDotsLayer();
+
+      // Gem sparkle
+      if (entry.goal) {
+        const gem = document.createElement('span');
+        gem.className = 'gem';
+        gem.textContent = '◆';
+        gem.style.top = '-10px';
+        gem.style.bottom = 'auto';
+        braid.appendChild(gem);
+        
+        // Responsive sparkle
+        braid.addEventListener('mousemove', (e) => {
+          const rect = braid.getBoundingClientRect();
+          const dx = e.clientX - (rect.left + rect.width / 2);
+          const dy = e.clientY - (rect.top + rect.height / 2);
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const glow = Math.min(20, Math.max(5, 50 - dist / 5));
+          gem.style.textShadow = `0 0 ${glow}px white, 0 0 ${glow + 10}px silver`;
+        });
+        braid.addEventListener('touchmove', (e) => {
+          const touch = e.touches[0];
+          gem.style.textShadow = `0 0 15px white, 0 0 25px silver`;
+        });
+      }
+
+      braid.addEventListener('click', () => showDetail(entry.id));
+      galaxyStrings.appendChild(braid);
+    }
+
+    // Handle resize
+    window.addEventListener('resize', () => {
+      if (galaxyOverlay.style.display === 'block') {
+        renderGalaxy();
+      }
+    });
   </script>
 </body>
 </html>
