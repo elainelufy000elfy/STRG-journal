@@ -6,94 +6,60 @@
 <title>STRNG Journal</title>
 <style>
 body {
-  margin: 0;
+  margin:0;
   font-family: monospace, system-ui, sans-serif;
   font-style: italic;
-  background: linear-gradient(180deg, #2a2a2a, #cfc4e0);
   color: rgba(255,255,255,0.7);
   overflow-x: hidden;
-  transition: background 20s linear;
-  animation: backgroundRotate 60s linear infinite;
+  background: linear-gradient(180deg, #fffacd, #4b1f28);
+  animation: bgDissolve 60s linear infinite;
   filter: saturate(0.7);
 }
-@keyframes backgroundRotate {
-  0% { background: linear-gradient(180deg, #2a2a2a, #cfc4e0); }
-  50% { background: linear-gradient(180deg, #3c3c3c, #e0d6f0); }
-  100% { background: linear-gradient(180deg, #2a2a2a, #cfc4e0); }
+@keyframes bgDissolve {
+  0% { background: linear-gradient(180deg, #fffacd, #4b1f28); }
+  50% { background: linear-gradient(180deg, #fff8b0, #521b29); }
+  100% { background: linear-gradient(180deg, #fffacd, #4b1f28); }
 }
 
 main { max-width: 720px; margin: auto; padding: 2rem; position: relative; font-size: 0.8em; }
-h1 { font-weight: 300; font-size: 1.6rem; filter: blur(1px); }
-label { display: block; margin-bottom: 0.4rem; opacity: 0.7; font-size: 0.8em; filter: blur(0.8px); }
-input[type="range"], textarea, input[type="text"] { width: 100%; padding: 0.6rem; font-style: italic; font-size: 0.8em; }
-textarea { height: 90px; background: rgba(255,255,255,0.05); border: none; color: rgba(255,255,255,0.7); }
-button {
-  background: rgba(255,255,255,0.1); border: none; color: rgba(255,255,255,0.7);
-  padding: 0.6rem 1.2rem; cursor: pointer; margin-top: 1rem; font-size: 0.8em; filter: blur(0.5px);
+h1 {
+  font-weight: 300; font-size: 1.6rem; filter: blur(1px); position: relative;
+  display: inline-block;
 }
-#rememoryBtn {
-  position: fixed; top: 10px; left: 10px; z-index: 1001;
-  background: rgba(255,255,255,0.1); padding: 8px 12px; border: none; cursor: pointer;
-  border-radius: 25px; backdrop-filter: blur(8px);
-  font-size: 0.8em; filter: blur(0.5px);
-}
+h1 span { display: inline-block; position: relative; transition: transform 10s ease-in-out; }
 
-#rug { display: flex; align-items: flex-end; justify-content: center; flex-wrap: nowrap; gap: 2px; min-height: 300px; }
+label, input[type="text"], textarea, button { font-size: 0.8em; filter: blur(0.5px); }
+label { opacity: 0.7; }
+textarea { background: rgba(255,255,255,0.05); border:none; color: rgba(255,255,255,0.7); height: 90px; }
 
-.thread {
-  width: 2px; height: 150px; border-radius: 1px;
-  transform-origin: bottom center;
-  transition: transform 1s ease, background 1s ease;
-  cursor: pointer;
-  position: relative;
-  animation: sway 4s ease-in-out infinite alternate;
-}
-@keyframes sway {
-  0% { transform: rotate(-3deg); }
-  50% { transform: rotate(3deg); }
-  100% { transform: rotate(-3deg); }
-}
+button { background: rgba(255,255,255,0.1); border:none; color: rgba(255,255,255,0.7); padding:0.6rem 1.2rem; cursor:pointer; margin-top:1rem; }
 
-.gem {
-  font-size: 11px; color: silver; position: absolute; bottom: -8px;
-  left: 50%; transform: translateX(-50%); transition: all 0.5s ease;
-}
+#rememoryBtn { position: fixed; top:10px; left:10px; z-index:1001; background: rgba(255,255,255,0.1); padding:8px 12px; border:none; cursor:pointer; border-radius:25px; backdrop-filter:blur(8px); font-size:0.8em; }
 
-#detail-view {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-  color: rgba(255,255,255,0.7); padding: 2rem; display: none; z-index: 999; overflow-y: auto;
-  font-size: 0.8em; filter: blur(0.5px);
-}
-#close-detail { position: absolute; top: 12px; right: 12px; cursor: pointer; padding: 6px 12px; background: rgba(255,255,255,0.7); color: #111; font-size: 0.8em; }
+#rug { display:flex; align-items:flex-end; justify-content:center; flex-wrap:nowrap; gap:2px; min-height:300px; }
 
-/* === GALAXY VIEW === */
-#galaxy-view {
-  position: fixed; inset: 0; display: none; z-index: 1000; overflow: hidden;
-  background: linear-gradient(135deg, #e6ddf5, #d3cde0);
-  animation: galaxyRotate 60s linear infinite;
-  filter: saturate(0.7);
-}
-@keyframes galaxyRotate {
-  0% { background: linear-gradient(135deg, #e6ddf5, #d3cde0); }
-  50% { background: linear-gradient(135deg, #ded0e8, #cbc1d9); }
-  100% { background: linear-gradient(135deg, #e6ddf5, #d3cde0); }
-}
+.thread { width:2px; height:150px; border-radius:1px; transform-origin:bottom center; transition: transform 1s ease, background 1s ease; cursor:pointer; position:relative; animation:sway 4s ease-in-out infinite alternate;}
+@keyframes sway{0%{transform:rotate(-3deg);}50%{transform:rotate(3deg);}100%{transform:rotate(-3deg);}}
 
-#galaxy-text { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 1em; filter: blur(1px); }
-#galaxy-strings { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; }
-.braid-thread {
-  width: 2px; height: 200px; margin: 1px; transform-origin: bottom center;
-  border-radius: 1px; position: relative;
-}
+.gem { font-size:11px;color:silver;position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);transition:all 0.5s ease; }
 
-#galaxy-cloud {
-  position: absolute; bottom: 0; width: 100%; height: 150px;
-  background: radial-gradient(ellipse at bottom, rgba(255,255,255,0.15) 0%, transparent 100%);
-  filter: blur(50px);
-}
+#detail-view { position:fixed; inset:0; background: rgba(0,0,0,0.9); color: rgba(255,255,255,0.7); padding:2rem; display:none; z-index:999; overflow-y:auto; font-size:0.8em; filter:blur(0.5px); }
+#close-detail { position:absolute; top:12px; right:12px; cursor:pointer; padding:6px 12px; background: rgba(255,255,255,0.7); color:#111; font-size:0.8em; }
 
-/* Dot letters aesthetic for cursive effect */
-.dot-letter { font-family: monospace; font-weight: bold; color: rgba(255,255,255,0.6); opacity: 0.7; letter-spacing: 1px; filter: blur(1.2px); font-size: 0.8em; position: absolute; white-space: pre; }
+#galaxy-view { position:fixed; inset:0; display:none; z-index:1000; overflow:hidden; background:linear-gradient(135deg, #e6ddf5, #d3cde0); animation:galaxyRotate 60s linear infinite; filter: saturate(0.7); }
+@keyframes galaxyRotate {0%{background:linear-gradient(135deg,#e6ddf5,#d3cde0);}50%{background:linear-gradient(135deg,#ded0e8,#cbc1d9);}100%{background:linear-gradient(135deg,#e6ddf5,#d3cde0);}}
+
+#galaxy-text { position:absolute; top:20px; left:50%; transform:translateX(-50%); color: rgba(255,255,255,0.6); font-size:1em; filter:blur(1px); }
+#galaxy-strings { position:absolute; top:50px; left:50%; transform:translateX(-50%); display:flex; flex-wrap:wrap; justify-content:center; }
+.braid-thread { width:2px; height:200px; margin:1px; transform-origin:bottom center; border-radius:1px; position:relative; cursor:pointer; }
+
+#galaxy-cloud { position:absolute; bottom:0; width:100%; height:150px; background: radial-gradient(ellipse at bottom, rgba(255,255,255,0.15) 0%, transparent 100%); filter:blur(50px); }
+
+.dot-letter { font-family: monospace; font-weight:bold; color: rgba(255,255,255,0.6); opacity:0.7; letter-spacing:1px; filter:blur(1.2px); font-size:0.8em; position:absolute; white-space:pre; }
+
+.mood-dots { display:flex; gap:5px; margin:5px 0; }
+.mood-dot { width:15px; height:15px; border-radius:50%; border:1px solid rgba(255,255,255,0.5); cursor:pointer; transition: all 0.3s ease; background: rgba(255,255,255,0.1); }
+.mood-dot.selected { background: silver; box-shadow:0 0 10px silver; }
 </style>
 </head>
 <body>
@@ -101,15 +67,17 @@ button {
 <button id="rememoryBtn">Rememory</button>
 
 <main>
-  <h1>STRNG Journal</h1>
+  <h1 id="title"><span>S</span><span>T</span><span>R</span><span>N</span><span>G</span> Journal</h1>
+
   <div>
-    <label>How intense does today feel?</label>
-    <input type="range" id="intensity" min="1" max="100">
+    <label>Intensity</label>
+    <div id="intensity-dots" class="mood-dots"></div>
   </div>
   <div>
-    <label>How pleasant was the day?</label>
-    <input type="range" id="pleasantness" min="1" max="100">
+    <label>Pleasantness</label>
+    <div id="pleasant-dots" class="mood-dots"></div>
   </div>
+
   <div>
     <label>Reflection</label>
     <textarea id="entryText"></textarea>
@@ -137,29 +105,45 @@ button {
 
 <script>
 let entries=[]; let goalMemory={};
+let intensityVal=5; let pleasantVal=5;
+
+// Mood dots
+function createMoodDots(containerId, setter){
+  const container=document.getElementById(containerId);
+  for(let i=1;i<=10;i++){
+    const dot=document.createElement('div'); dot.className='mood-dot'; dot.dataset.value=i;
+    dot.addEventListener('click',()=>{ setter(i); updateDots(containerId, i); });
+    container.appendChild(dot);
+  }
+  updateDots(containerId,5);
+}
+function updateDots(containerId,value){
+  const dots=document.getElementById(containerId).children;
+  for(let i=0;i<dots.length;i++){ dots[i].classList.toggle('selected', i<value);}
+}
+createMoodDots('intensity-dots',v=>intensityVal=v);
+createMoodDots('pleasant-dots',v=>pleasantVal=v);
 
 function registerGoal(goalText){ if(!goalMemory[goalText]) goalMemory[goalText]=1; else goalMemory[goalText]++; }
 
 function createEntry(){
-  const intensity=+document.getElementById('intensity').value;
-  const pleasant=+document.getElementById('pleasantness').value;
   const text=document.getElementById('entryText').value;
   const goal=document.getElementById('goalInput').value;
 
-  let hue=240; let lightness=50+pleasant/2;
-  if(intensity>50){ hue=270; lightness+=10; }
-  if(pleasant>50){ hue=50; lightness+=10; }
-  const color=`linear-gradient(90deg, hsl(${hue},60%,${lightness}%), hsl(${hue+30},60%,${lightness+10}%))`;
+  let hue=240; let lightness=50+pleasantVal*2;
+  if(intensityVal>5){ hue=270; lightness+=5; }
+  if(pleasantVal>5){ hue=50; lightness+=5; }
+  const color=`linear-gradient(90deg,hsl(${hue},60%,${lightness}%),hsl(${hue+30},60%,${lightness+10}%))`;
 
-  const entry={id:Date.now(), date:new Date().toLocaleString(), intensity, pleasant, text, goal, color};
+  const entry={id:Date.now(), date:new Date().toLocaleString(), intensity:intensityVal, pleasant:pleasantVal, text, goal, color};
   entries.push(entry);
   renderThread(entry);
-  document.getElementById('entryText').value="";
-  document.getElementById('goalInput').value="";
+  document.getElementById('entryText').value='';
+  document.getElementById('goalInput').value='';
+
   if(goal){
     registerGoal(goal);
-    const rug=document.getElementById('rug');
-    const lastThread=rug.lastChild;
+    const rug=document.getElementById('rug'); const lastThread=rug.lastChild;
     const gem=document.createElement('span'); gem.className='gem'; gem.textContent='◆';
     if(goalMemory[goal]%3===0) gem.style.textShadow="0 0 10px white";
     lastThread.appendChild(gem);
@@ -182,68 +166,84 @@ function showDetail(entryId){
 }
 document.getElementById('close-detail').addEventListener('click',()=>document.getElementById('detail-view').style.display='none');
 
+// Title petal animation
+const titleLetters=document.querySelectorAll('#title span');
+function animateTitle(){ titleLetters.forEach((l,i)=>{ l.style.transform=`translate(${Math.random()*20-10}px,${Math.random()*20-10}px)`; }); setTimeout(()=>{ titleLetters.forEach(l=>l.style.transform='translate(0,0)'); },10000); }
+setInterval(animateTitle,10000);
+
 const galaxyBtn=document.getElementById('rememoryBtn');
 const galaxyOverlay=document.getElementById('galaxy-view');
 const galaxyStrings=document.getElementById('galaxy-strings');
 
+// --- Galaxy view enhanced ---
 galaxyBtn.addEventListener('click',()=>{
   galaxyOverlay.style.display='block';
   galaxyStrings.innerHTML='';
 
-  entries.forEach(entry=>{
-    const braid=document.createElement('div'); braid.className='braid-thread'; braid.style.background=entry.color;
-    const amplitude=entry.pleasant/2+1;
-    const freq=Math.max(2,10-entry.intensity/15);
-    braid.style.animation=`braidSway ${freq}s ease-in-out infinite alternate`;
+  const layers=3; // overlapping braid layers
+  for(let l=0;l<layers;l++){
+    entries.forEach(entry=>{
+      const braid=document.createElement('div'); braid.className='braid-thread'; 
+      braid.style.background='transparent'; braid.style.position='absolute';
+      braid.style.bottom=`${30+l*30}px`; braid.style.left=`${Math.random()*50-25}px`;
 
-    // Create dot-letter animation in sine wave for cursive-like effect
-    const textContainer=document.createElement('div'); textContainer.style.position='relative';
-    const letters=entry.text.split('');
-    letters.forEach((c,i)=>{
-      const dot=document.createElement('div'); dot.className='dot-letter'; dot.innerText='•';
-      dot.style.left=(i*10)+'px';
-      dot.style.bottom='0px';
-      dot.dataset.offset=Math.random()*2*Math.PI;
-      textContainer.appendChild(dot);
-    });
-    braid.appendChild(textContainer);
+      // Canvas for cursive string
+      const canvas=document.createElement('canvas'); canvas.width=600; canvas.height=200; canvas.style.display='block';
+      braid.appendChild(canvas);
+      const ctx=canvas.getContext('2d');
 
-    // Animate dots along sine wave
-    function animateDots(){
-      const t=Date.now()/1000;
-      const dots=textContainer.children;
-      for(let i=0;i<dots.length;i++){
-        const offset=parseFloat(dots[i].dataset.offset);
-        dots[i].style.bottom=(5*Math.sin(t+offset))+'px';
+      const points=[]; const len=entry.text.length;
+      for(let i=0;i<len;i++){ points.push({x:i*20,y:100+15*l+20*Math.sin(i*0.3+Math.random()*2*Math.PI)}); }
+
+      function drawLayer(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.lineWidth=2;
+        const grad=ctx.createLinearGradient(0,0,canvas.width,0);
+        grad.addColorStop(0, entry.color.split(',')[0]+')');
+        grad.addColorStop(1, entry.color.split(',')[1]+')');
+        ctx.strokeStyle=grad;
+        ctx.beginPath(); ctx.moveTo(points[0].x,points[0].y);
+        for(let i=1;i<points.length;i++){
+          const cpX=(points[i-1].x+points[i].x)/2;
+          const cpY=(points[i-1].y+points[i].y)/2;
+          ctx.quadraticCurveTo(points[i-1].x,points[i-1].y,cpX,cpY);
+        }
+        ctx.stroke();
+        points.forEach(p=>{ p.y += Math.sin(Date.now()/1000+Math.random()*10)*0.15; });
+        requestAnimationFrame(drawLayer);
       }
-      requestAnimationFrame(animateDots);
-    }
-    animateDots();
+      drawLayer();
 
-    if(entry.goal){
-      const gem=document.createElement('span'); gem.className='gem'; gem.textContent='◆';
-      gem.style.top='-10px'; gem.style.bottom='auto';
-      braid.appendChild(gem);
-    }
+      // Dot-letter effect
+      const letters=entry.text.split('');
+      letters.forEach((c,i)=>{
+        const dot=document.createElement('div'); dot.className='dot-letter'; dot.innerText='•';
+        dot.style.left=(i*18)+'px'; dot.style.bottom='0px'; dot.dataset.offset=Math.random()*2*Math.PI;
+        braid.appendChild(dot);
+      });
+      function animateDotsLayer(){
+        const t=Date.now()/1000;
+        const dots=braid.querySelectorAll('.dot-letter');
+        for(let i=0;i<dots.length;i++){ const offset=parseFloat(dots[i].dataset.offset); dots[i].style.bottom=(5*Math.sin(t+offset))+'px'; }
+        requestAnimationFrame(animateDotsLayer);
+      }
+      animateDotsLayer();
 
-    braid.addEventListener('click',()=>showDetail(entry.id));
-    galaxyStrings.appendChild(braid);
-  });
+      // Gem sparkle
+      if(entry.goal){
+        const gem=document.createElement('span'); gem.className='gem'; gem.textContent='◆';
+        gem.style.top='-10px'; gem.style.bottom='auto';
+        gem.addEventListener('mousemove',()=>{ gem.style.textShadow="0 0 20px white,0 0 30px silver"; });
+        braid.appendChild(gem);
+      }
+
+      braid.addEventListener('click',()=>showDetail(entry.id));
+      galaxyStrings.appendChild(braid);
+    });
+  }
 });
 
 galaxyOverlay.addEventListener('dblclick',()=>{galaxyOverlay.style.display='none';});
-
-// Particles (snowflakes/stars)
-for(let i=0;i<120;i++){
-  const p=document.createElement('div'); p.className='particle';
-  p.style.top=Math.random()*window.innerHeight+'px'; p.style.left=Math.random()*window.innerWidth+'px';
-  p.style.opacity=0.3+Math.random()*0.5; document.body.appendChild(p);
-}
-for(let i=0;i<15;i++){
-  const f=document.createElement('div'); f.className='firework';
-  f.style.top=Math.random()*window.innerHeight+'px'; f.style.left=Math.random()*window.innerWidth+'px';
-  f.style.opacity=0.2+Math.random()*0.3; document.body.appendChild(f);
-}
 </script>
 </body>
 </html>
