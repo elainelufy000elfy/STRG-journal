@@ -75,10 +75,11 @@
       height: 150px;
       border-radius: 1px;
       transform-origin: bottom center;
-      transition: transform 1s ease, background 1s ease;
+      transition: transform 2s ease, background 1s ease, opacity 0.5s ease;
       cursor: pointer;
       position: relative;
       animation: sway 4s ease-in-out infinite alternate;
+      opacity: 0.7;
     }
 
     @keyframes sway {
@@ -94,7 +95,13 @@
       bottom: -8px;
       left: 50%;
       transform: translateX(-50%);
+      animation: sparkle 1s infinite alternate;
       transition: all 0.5s ease;
+    }
+
+    @keyframes sparkle {
+      0% { text-shadow: 0 0 10px white, 0 0 15px white, 0 0 20px silver; }
+      100% { text-shadow: 0 0 20px white, 0 0 40px silver, 0 0 50px white; }
     }
 
     #detail-view {
@@ -350,10 +357,11 @@
 
     document.getElementById('rememoryBtn').addEventListener('click', function() {
       // Zoom into strings with some opacity reduction
-      document.body.style.transition = 'opacity 0.5s ease';
+      document.body.style.transition = 'opacity 1s ease';
       document.body.style.opacity = '0.1';  // Make everything except strings fade out
       document.getElementById('rug').style.transform = 'scale(1.2)'; // Zoom effect on strings
-      
+      document.getElementById('rug').style.transition = 'transform 1s ease';
+
       // Activate galaxy strings animation
       const strings = document.querySelectorAll('.thread');
       let direction = 1; // 1 for left-to-right, -1 for right-to-left
@@ -378,7 +386,7 @@
 
           // Animation sliding: move left-to-right or right-to-left
           setTimeout(() => {
-            string.style.transition = `transform 2s ease`;  // Move slower
+            string.style.transition = `transform 2.6s ease`;  // Move slower by 30%
             string.style.transform = `translateX(${direction * 100}%)`;
           }, delayTime);
 
@@ -392,14 +400,14 @@
             } else {
               string.style.transform = `translateX(100%)`; // Move string back to the right
             }
-          }, 2500);  // After 2.5 seconds (duration of sliding)
+          }, 3000);  // After 3 seconds (duration of sliding)
 
           // Toggle the direction
           direction *= -1;
         });
 
         // Recursive animation
-        setTimeout(animateStrings, 3000);  // Repeat after 3 seconds delay (total cycle)
+        setTimeout(animateStrings, 4000);  // Repeat after 4 seconds delay (total cycle)
       }
 
       animateStrings();
@@ -408,12 +416,12 @@
       const quote = document.createElement('div');
       quote.innerHTML = 'Strings are stronger when woven together';
       quote.style.position = 'absolute';
-      quote.style.bottom = '20px';
+      quote.style.bottom = '5px';
       quote.style.width = '100%';
       quote.style.textAlign = 'center';
       quote.style.fontFamily = 'cursive';
-      quote.style.fontSize = '2rem';
-      quote.style.color = 'rgba(255, 255, 255, 0.6)';
+      quote.style.fontSize = '0.8rem';
+      quote.style.color = 'rgba(255, 255, 255, 0.4)';
       quote.style.opacity = '0.5';
       quote.style.transition = 'opacity 2s ease';
       document.body.appendChild(quote);
