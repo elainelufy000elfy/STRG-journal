@@ -209,6 +209,7 @@
       background: silver;
       box-shadow: 0 0 10px silver;
     }
+
   </style>
 </head>
 <body>
@@ -252,7 +253,100 @@
   </div>
 
   <script>
-    // Your existing JavaScript code remains untouched here
+    let entries = [];
+    let goalMemory = {};
+    let intensityVal = 50;  // Initial value for intensity
+    let pleasantVal = 50;  // Initial value for pleasantness
+
+    function createMoodDots(containerId, setter) {
+      const container = document.getElementById(containerId);
+      for (let i = 1; i <= 10; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'mood-dot';
+        dot.dataset.value = i;
+        dot.addEventListener('click', () => {
+          setter(i);
+          updateDots(containerId, i);
+        });
+        container.appendChild(dot);
+      }
+      updateDots(containerId, 5);  // Default to value 5
+    }
+
+    function updateDots(containerId, value) {
+      const dots = document.getElementById(containerId).children;
+      for (let i = 0; i < dots.length; i++) {
+        dots[i].classList.toggle('selected', i < value);
+      }
+    }
+
+    createMoodDots('intensity-dots', v => intensityVal = v);
+    createMoodDots('pleasant-dots', v => pleasantVal = v);
+
+    function registerGoal(goalText) {
+      if (!goalMemory[goalText]) goalMemory[goalText] = 1;
+      else goalMemory[goalText]++;
+    }
+
+    function createEntry() {
+      const text = document.getElementById('entryText').value;
+      const goal = document.getElementById('goalInput').value;
+      
+      let hue = 240;
+      let lightness = 50 + pleasantVal * 2;
+      if (intensityVal > 5) { hue = 270; lightness += 5; }
+      if (pleasantVal > 5) { hue = 50; lightness += 5; }
+      const color = `linear-gradient(90deg, hsl(${hue}, 60%, ${lightness}%), hsl(${hue + 30}, 60%, ${lightness + 10}%))`;
+
+      const entry = {
+        id: Date.now(),
+        date: new Date().toLocaleString(),
+        intensity: intensityVal,
+        pleasant: pleasantVal,
+        text,
+        goal,
+        color
+      };
+
+      entries.push(entry);
+      renderThread(entry);
+      document.getElementById('entryText').value = '';
+      document.getElementById('goalInput').value = '';
+
+      if (goal) {
+        registerGoal(goal);
+        const rug = document.getElementById('rug');
+        const lastThread = rug.lastChild;
+        const gem = document.createElement('span');
+        gem.className = 'gem';
+        gem.textContent = '◆';
+        if (goalMemory[goal] % 3 === 0) gem.style.textShadow = "0 0 10px white";
+        lastThread.appendChild(gem);
+      }
+    }
+
+    function renderThread(entry) {
+      const rug = document.getElementById('rug');
+      const div = document.createElement('div');
+      div.className = 'thread';
+      div.style.background = entry.color;
+      div.dataset.entryId = entry.id;
+      div.addEventListener('click', () => showDetail(entry.id));
+      rug.appendChild(div);
+    }
+
+    function showDetail(entryId) {
+      const entry = entries.find(e => e.id == entryId);
+      if (!entry) return;
+      document.getElementById('detail-date').innerText = entry.date;
+      document.getElementById('detail-text').innerText = entry.text;
+      document.getElementById('detail-goal').innerText = entry.goal ? "Goal: " + entry.goal : "";
+      document.getElementById('detail-view').style.display = 'block';
+    }
+
+    document.getElementById('close-detail').addEventListener('click', () => {
+      document.getElementById('detail-view').style.display = 'none';
+    });
 
     document.getElementById('rememoryBtn').addEventListener('click', function() {
       // Zoom into strings with some opacity reduction
@@ -326,7 +420,7 @@
       
       // Remove the quote when user double-clicks to exit
       document.body.addEventListener('dblclick', () => {
-        document.body.style.opacity = '1'; 
+        document.body.style.opacity = '1';
         document.getElementById('rug').style.transform = 'scale(1)'; // Reset zoom
         document.body.removeChild(quote);  // Remove quote
       });
