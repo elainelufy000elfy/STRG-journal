@@ -210,29 +210,13 @@
       box-shadow: 0 0 10px silver;
     }
 
-    /* Styles for Rememory page */
-    #rememory-content {
-      display: none;
-      margin-top: 20px;
-    }
-
-    .rememory-thread {
-      width: 2px;
-      height: 150px;
-      border-radius: 1px;
-      position: relative;
-      margin: 10px 0;
-      animation: sway 10s ease-in-out infinite alternate;
-    }
   </style>
 </head>
-
 <body>
   <button id="rememoryBtn">Rememory</button>
 
   <main>
     <h1 id="title"><span>S</span><span>T</span><span>R</span><span>N</span><span>G</span> Journal</h1>
-
     <div>
       <label>Intensity</label>
       <div id="intensity-dots" class="mood-dots"></div>
@@ -252,38 +236,152 @@
     </div>
     <button onclick="createEntry()">Weave Entry</button>
     <div id="rug"></div>
-
-    <!-- Rememory Section -->
-    <div id="rememory-content">
-      <h2>Your Past Entries (Rememory)</h2>
-      <div id="threads-container"></div>
-    </div>
   </main>
 
+  <div id="detail-view">
+    <div id="close-detail">CLOSE</div>
+    <h2 id="detail-date"></h2>
+    <div id="detail-text"></div>
+    <div id="detail-goal"></div>
+  </div>
+
+  <div id="galaxy-view">
+    <canvas id="galaxy-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;"></canvas>
+    <div id="galaxy-text">Double click anywhere to exit</div>
+    <div id="galaxy-strings"></div>
+    <div id="galaxy-cloud"></div>
+  </div>
+
   <script>
-    let entries = JSON.parse(localStorage.getItem('entries')) || [];  // Get saved entries from localStorage
+    let entries = [];
     let goalMemory = {};
-    let intensityVal = 50;  
-    let pleasantVal = 50;  
+    let intensityVal = 50;  // Initial value for intensity
+    let pleasantVal = 50;  // Initial value for pleasantness
 
-    // Same functions for mood dots, creating entries, etc. as before...
+    function createMoodDots(containerId, setter) {
+      const container = document.getElementById(containerId);
+      for (let i = 1; i <= 10; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'mood-dot';
+        dot.dataset.value = i;
+        dot.addEventListener('click', () => {
+          setter(i);
+          updateDots(containerId, i);
+        });
+        container.appendChild(dot);
+      }
+      updateDots(containerId, 5);  // Default to value 5
+    }
 
-    // Rememory functionality
+    function updateDots(containerId, value) {
+      const dots = document.getElementById(containerId).children;
+      for (let i = 0; i < dots.length; i++) {
+        dots[i].classList.toggle('selected', i < value);
+      }
+    }
+
+    createMoodDots('intensity-dots', v => intensityVal = v);
+    createMoodDots('pleasant-dots', v => pleasantVal = v);
+
+    function registerGoal(goalText) {
+      if (!goalMemory[goalText]) goalMemory[goalText] = 1;
+      else goalMemory[goalText]++;
+    }
+
+    function createEntry() {
+      const text = document.getElementById('entryText').value;
+      const goal = document.getElementById('goalInput').value;
+      
+      let hue = 240;
+      let lightness = 50 + pleasantVal * 2;
+      if (intensityVal > 5) { hue = 270; lightness += 5; }
+      if (pleasantVal > 5) { hue = 50; lightness += 5; }
+      const color = `linear-gradient(90deg, hsl(${hue}, 60%, ${lightness}%), hsl(${hue + 30}, 60%, ${lightness + 10}%))`;
+
+      const entry = {
+        id: Date.now(),
+        date: new Date().toLocaleString(),
+        intensity: intensityVal,
+        pleasant: pleasantVal,
+        text,
+        goal,
+        color
+      };
+
+      entries.push(entry);
+      renderThread(entry);
+      document.getElementById('entryText').value = '';
+      document.getElementById('goalInput').value = '';
+
+      if (goal) {
+        registerGoal(goal);
+        const rug = document.getElementById('rug');
+        const lastThread = rug.lastChild;
+        const gem = document.createElement('span');
+        gem.className = 'gem';
+        gem.textContent = '◆';
+        if (goalMemory[goal] % 3 === 0) gem.style.textShadow = "0 0 10px white";
+        lastThread.appendChild(gem);
+      }
+    }
+
+    function renderThread(entry) {
+      const rug = document.getElementById('rug');
+      const div = document.createElement('div');
+      div.className = 'thread';
+      div.style.background = entry.color;
+      div.dataset.entryId = entry.id;
+      div.addEventListener('click', () => showDetail(entry.id));
+      rug.appendChild(div);
+    }
+
+    function showDetail(entryId) {
+      const entry = entries.find(e => e.id == entryId);
+      if (!entry) return;
+      document.getElementById('detail-date').innerText = entry.date;
+      document.getElementById('detail-text').innerText = entry.text;
+      document.getElementById('detail-goal').innerText = entry.goal ? "Goal: " + entry.goal : "";
+      document.getElementById('detail-view').style.display = 'block';
+    }
+
+    document.getElementById('close-detail').addEventListener('click', () => {
+      document.getElementById('detail-view').style.display = 'none';
+    });
+
     document.getElementById('rememoryBtn').addEventListener('click', function() {
-      // Show the Rememory section
-      document.getElementById('rememory-content').style.display = 'block';
-      document.getElementById('rug').style.display = 'none'; // Hide main journal section
+      // Change Background Color (Mood Indicator)
+      const hue = 180 + (pleasantVal - 50);
+      const saturation = 20 + intensityVal * 0.6;
+      const lightness = 20 + pleasantVal * 0.4;
 
-      // Render all past entries in Rememory section
-      const threadsContainer = document.getElementById('threads-container');
-      threadsContainer.innerHTML = '';  // Clear existing threads
+      document.documentElement.style.setProperty('--base-hue', hue);
+      document.documentElement.style.setProperty('--saturation', saturation + '%');
+      document.documentElement.style.setProperty('--lightness', lightness + '%');
 
-      entries.forEach(entry => {
-        const thread = document.createElement('div');
-        thread.className = 'rememory-thread';
-        thread.style.background = entry.color;
-        threadsContainer.appendChild(thread);
-      });
+      // Add a new thread to the rug based on the current mood
+      const thread = document.createElement('div');
+      thread.className = 'thread';
+      thread.style.background = `linear-gradient(90deg, hsl(${hue - 20}, ${saturation}%, ${lightness}%), hsl(${hue + 20}, ${saturation}%, ${lightness}%))`;
+
+      if (intensityVal > 80) thread.classList.add('burn');
+      else if (pleasantVal > 60) thread.classList.add('glow');
+      else thread.classList.add('dim');
+
+      // Add the new thread to the rug
+      document.getElementById('rug').appendChild(thread);
+
+      // Handle goal thread (Gem)
+      const goal = document.getElementById('goalInput').value;
+      if (goal) {
+        goalMemory[goal] = (goalMemory[goal] || 0) + 1;
+
+        if (goalMemory[goal] % 10 === 0) {
+          const goalThread = document.createElement('div');
+          goalThread.className = 'goal-thread';
+          goalThread.innerHTML = `<span class="gem">◆</span>`;
+          document.getElementById('rug').appendChild(goalThread);
+        }
+      }
     });
   </script>
 </body>
