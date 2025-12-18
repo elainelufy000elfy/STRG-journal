@@ -236,7 +236,7 @@
       <input type="text" id="goalInput">
     </div>
     <button onclick="createEntry()">Weave Entry</button>
-    <div id="rug"></div>
+  <div id="rug"></div>
   </main>
 
   <div id="detail-view">
@@ -256,8 +256,8 @@
   <script>
     let entries = [];
     let goalMemory = {};
-    let intensityVal = 5;
-    let pleasantVal = 5;
+    let intensityVal = 50;  // Initial value for intensity
+    let pleasantVal = 50;  // Initial value for pleasantness
 
     function createMoodDots(containerId, setter) {
       const container = document.getElementById(containerId);
@@ -271,7 +271,7 @@
         });
         container.appendChild(dot);
       }
-      updateDots(containerId, 5);
+      updateDots(containerId, 5);  // Default to value 5
     }
 
     function updateDots(containerId, value) {
@@ -349,174 +349,41 @@
       document.getElementById('detail-view').style.display = 'none';
     });
 
-    const titleLetters = document.querySelectorAll('#title span');
-    function animateTitle() {
-      titleLetters.forEach((l, i) => {
-        l.style.transform = `translate(${Math.random() * 20 - 10}px,${Math.random() * 20 - 10}px)`;
-      });
-      setTimeout(() => {
-        titleLetters.forEach(l => l.style.transform = 'translate(0,0)');
-      }, 10000);
-    }
-    setInterval(animateTitle, 10000);
-
-    const galaxyBtn = document.getElementById('rememoryBtn');
-    const galaxyOverlay = document.getElementById('galaxy-view');
-    const galaxyStrings = document.getElementById('galaxy-strings');
-    galaxyBtn.addEventListener('click', () => {
-      galaxyOverlay.style.display = 'block';
-      galaxyStrings.innerHTML = '';
-      const layers = 3;
-      for (let l = 0; l < layers; l++) {
-        entries.forEach(entry => {
-          createGalaxyThread(entry, l, layers);
-        });
-      }
-    });
-
-    galaxyOverlay.addEventListener('dblclick', () => {
-      galaxyOverlay.style.display = 'none';
-    });
-
-    // Galaxy thread creation function
-    function createGalaxyThread(entry, layerIndex, totalLayers) {
-      const braid = document.createElement('div');
-      braid.className = 'braid-thread';
-      braid.style.position = 'absolute';
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      braid.style.bottom = `${20 + layerIndex * 50}px`;
-      braid.style.left = `${vw / 2 + (Math.random() * vw / 4 - vw / 8)}px`;
-
-      // Create scalable canvas
-      const canvas = document.createElement('canvas');
-      canvas.width = vw * 0.4; 
-      canvas.height = vh * 0.2;
-      braid.appendChild(canvas);
-      const ctx = canvas.getContext('2d');
-
-      // Prepare points for braid curve
-      const points = [];
-      const len = Math.min(entry.text.length, 30);
-      for (let i = 0; i < len; i++) {
-        points.push({ x: (canvas.width / len) * i, y: canvas.height / 2 + 20 * Math.sin(i * 0.3 + Math.random() * 2 * Math.PI) });
-      }
-
-      // Draw animated braid
-      function drawLayer() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
-        grad.addColorStop(0, entry.color.split(',')[0] + ')');
-        grad.addColorStop(1, entry.color.split(',')[1] + ')');
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for (let i = 1; i < points.length; i++) {
-          const cpX = (points[i - 1].x + points[i].x) / 2;
-          const cpY = (points[i - 1].y + points[i].y) / 2;
-          ctx.quadraticCurveTo(points[i - 1].x, points[i - 1].y, cpX, cpY);
-        }
-        ctx.stroke();
-        points.forEach(p => { p.y += Math.sin(Date.now() / 1000 + Math.random() * 10) * 0.15; });
-        requestAnimationFrame(drawLayer);
-      }
-      drawLayer();
-
-      // Dot-letter effect
-      const letters = entry.text.split('');
-      letters.forEach((c, i) => {
-        const dot = document.createElement('div');
-        dot.className = 'dot-letter';
-        dot.innerText = '•';
-        dot.style.left = (i * 18) + 'px';
-        dot.style.bottom = '0px';
-        dot.dataset.offset = Math.random() * 2 * Math.PI;
-        braid.appendChild(dot);
-      });
-
-      // Dot-letter animation
-      function animateDotsLayer() {
-        const t = Date.now() / 1000;
-        const dots = braid.querySelectorAll('.dot-letter');
-        for (let i = 0; i < dots.length; i++) {
-          const offset = parseFloat(dots[i].dataset.offset);
-          dots[i].style.bottom = (5 * Math.sin(t + offset)) + 'px';
-        }
-        requestAnimationFrame(animateDotsLayer);
-      }
-      animateDotsLayer();
-
-      // Gem sparkle
-      if (entry.goal) {
-        const gem = document.createElement('span');
-        gem.className = 'gem';
-        gem.textContent = '◆';
-        gem.style.top = '-10px';
-        gem.style.bottom = 'auto';
-        braid.appendChild(gem);
-        
-        // Responsive sparkle
-        braid.addEventListener('mousemove', (e) => {
-          const rect = braid.getBoundingClientRect();
-          const dx = e.clientX - (rect.left + rect.width / 2);
-          const dy = e.clientY - (rect.top + rect.height / 2);
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const glow = Math.min(20, Math.max(5, 50 - dist / 5));
-          gem.style.textShadow = `0 0 ${glow}px white, 0 0 ${glow + 10}px silver`;
-        });
-        braid.addEventListener('touchmove', (e) => {
-          const touch = e.touches[0];
-          gem.style.textShadow = `0 0 15px white, 0 0 25px silver`;
-        });
-      }
-
-      braid.addEventListener('click', () => showDetail(entry.id));
-      galaxyStrings.appendChild(braid);
-    }
-
-    // Handle resize
-    window.addEventListener('resize', () => {
-      if (galaxyOverlay.style.display === 'block') {
-        renderGalaxy();
-      }
-    });
     document.getElementById('rememoryBtn').addEventListener('click', function() {
-  // Change Background Color (Mood Indicator)
-  const hue = 180 + (pleasantVal - 50);
-  const saturation = 20 + intensityVal * 0.6;
-  const lightness = 20 + pleasantVal * 0.4;
+      // Change Background Color (Mood Indicator)
+      const hue = 180 + (pleasantVal - 50);
+      const saturation = 20 + intensityVal * 0.6;
+      const lightness = 20 + pleasantVal * 0.4;
 
-  document.documentElement.style.setProperty('--base-hue', hue);
-  document.documentElement.style.setProperty('--saturation', saturation + '%');
-  document.documentElement.style.setProperty('--lightness', lightness + '%');
+      document.documentElement.style.setProperty('--base-hue', hue);
+      document.documentElement.style.setProperty('--saturation', saturation + '%');
+      document.documentElement.style.setProperty('--lightness', lightness + '%');
 
-  // Add a new thread to the rug based on the current mood
-  const thread = document.createElement('div');
-  thread.className = 'thread';
-  thread.style.background = `linear-gradient(90deg, hsl(${hue - 20}, ${saturation}%, ${lightness}%), hsl(${hue + 20}, ${saturation}%, ${lightness}%))`;
+      // Add a new thread to the rug based on the current mood
+      const thread = document.createElement('div');
+      thread.className = 'thread';
+      thread.style.background = `linear-gradient(90deg, hsl(${hue - 20}, ${saturation}%, ${lightness}%), hsl(${hue + 20}, ${saturation}%, ${lightness}%))`;
 
-  if (intensityVal > 80) thread.classList.add('burn');
-  else if (pleasantVal > 60) thread.classList.add('glow');
-  else thread.classList.add('dim');
+      if (intensityVal > 80) thread.classList.add('burn');
+      else if (pleasantVal > 60) thread.classList.add('glow');
+      else thread.classList.add('dim');
 
-  // Add the new thread to the rug
-  document.getElementById('rug').appendChild(thread);
+      // Add the new thread to the rug
+      document.getElementById('rug').appendChild(thread);
 
-  // Handle goal thread (Gem)
-  const goal = document.getElementById('goalInput').value;
-  if (goal) {
-    goalMemory[goal] = (goalMemory[goal] || 0) + 1;
+      // Handle goal thread (Gem)
+      const goal = document.getElementById('goalInput').value;
+      if (goal) {
+        goalMemory[goal] = (goalMemory[goal] || 0) + 1;
 
-    if (goalMemory[goal] % 10 === 0) {
-      const goalThread = document.createElement('div');
-      goalThread.className = 'goal-thread';
-      goalThread.innerHTML = `<span class="gem">◆</span>`;
-      document.getElementById('rug').appendChild(goalThread);
-    }
-  }
-});
-
+        if (goalMemory[goal] % 10 === 0) {
+          const goalThread = document.createElement('div');
+          goalThread.className = 'goal-thread';
+          goalThread.innerHTML = `<span class="gem">◆</span>`;
+          document.getElementById('rug').appendChild(goalThread);
+        }
+      }
+    });
   </script>
 </body>
 </html>
