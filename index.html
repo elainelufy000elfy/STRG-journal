@@ -21,22 +21,9 @@
       flex-direction: column;
       text-align: center;
       overflow: hidden;
-      animation: backgroundShift 10s ease-in-out infinite;
       background: linear-gradient(135deg, hsl(10, 20%, 35%), hsl(10, 30%, 50%));
       background-size: 400% 400%;
       transition: background 0.5s ease;
-    }
-
-    @keyframes backgroundShift {
-      0% {
-        background: linear-gradient(135deg, hsl(10, 20%, 35%), hsl(10, 30%, 50%));
-      }
-      50% {
-        background: linear-gradient(135deg, hsl(10, 20%, 50%), hsl(10, 40%, 60%));
-      }
-      100% {
-        background: linear-gradient(135deg, hsl(10, 20%, 35%), hsl(10, 30%, 50%));
-      }
     }
 
     main {
@@ -44,7 +31,6 @@
       margin: auto;
       padding: 2rem;
       position: relative;
-      z-index: 1;
     }
 
     h1 {
@@ -112,6 +98,7 @@
       cursor: pointer;
       opacity: 0.8;
       will-change: transform;
+      transition: all 0.5s ease;
     }
 
     @keyframes bendString {
@@ -125,6 +112,7 @@
       background: linear-gradient(90deg, hsl(250, 80%, 60%), hsl(60, 90%, 60%)); /* No green, more purple & yellow */
     }
 
+    /* Goal Thread with Gems */
     .goal-thread {
       height: 10px;
       position: relative;
@@ -139,41 +127,20 @@
       color: silver;
     }
 
-    .reminder {
-      font-size: 0.75rem;
-      opacity: 0;
-      text-align: center;
-      margin-top: 1rem;
-      animation: none;
-    }
-
-    .reminder.show {
-      animation: floatIn 3s ease forwards;
-    }
-
-    @keyframes floatIn {
-      0% { opacity: 0; transform: translateY(10px); }
-      50% { opacity: 0.7; }
-      100% { opacity: 0; transform: translateY(-10px); }
-    }
-
-    .text-follow {
+    /* Pinpoints and Entry Memory */
+    .pinpoint {
       position: absolute;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      font-size: 0.7rem; /* Smaller font size for text-follow */
-      font-style: italic; /* Italic text for mouse-following text */
-      opacity: 0.8;
-      transition: transform 0.2s ease-in-out;
+      border-radius: 50%;
+      background: #fff;
+      width: 8px;
+      height: 8px;
+      animation: floatPinpoints 5s ease-in-out infinite;
     }
 
-    .goal-caption {
-      font-size: 1rem;
-      color: #bbb;
-      font-style: italic;
-      margin-top: 10px;
-      opacity: 0.7;
+    @keyframes floatPinpoints {
+      0% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-15px) scale(1.5); }
+      100% { transform: translateY(0) scale(1); }
     }
 
     /* Floating Caption for STRNG */
@@ -195,28 +162,6 @@
       100% { opacity: 0.7; }
     }
 
-    /* Zoom-In/Out Animation */
-    .zoom-in {
-      transform: scale(2);
-      transition: transform 1s ease-in-out;
-    }
-
-    /* Pinpoints and Entry Memory */
-    .pinpoint {
-      position: absolute;
-      border-radius: 50%;
-      background: #fff;
-      width: 8px;
-      height: 8px;
-      animation: floatPinpoints 5s ease-in-out infinite;
-    }
-
-    @keyframes floatPinpoints {
-      0% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-15px) scale(1.5); }
-      100% { transform: translateY(0) scale(1); }
-    }
-
     /* Galaxy View (Mouse at the top) */
     body.galaxy-view {
       background: black;
@@ -231,6 +176,7 @@
       margin: 1px 0;
       opacity: 0.4;
     }
+
   </style>
 </head>
 
