@@ -69,6 +69,8 @@
       flex-wrap: nowrap;
       gap: 2px;
       min-height: 300px;
+      position: relative;
+      z-index: 100;
     }
 
     .thread {
@@ -158,12 +160,13 @@
 
     #galaxy-strings {
       position: absolute;
-      top: 50px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY(-50%);
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
+      align-items: center;
     }
 
     .braid-thread {
@@ -360,9 +363,8 @@
       // Zoom into strings with some opacity reduction
       document.body.style.transition = 'opacity 1s ease';
       document.body.style.opacity = '0.1';  // Make everything except strings fade out
-      document.getElementById('rug').style.transform = 'scale(1.2)'; // Zoom effect on strings
-      document.getElementById('rug').style.transition = 'transform 1s ease';
-
+      document.getElementById('rug').style.transform = 'scale(1.5)'; // Zoom effect on strings
+      
       // Activate galaxy strings animation
       const strings = document.querySelectorAll('.thread');
       let direction = 1; // 1 for left-to-right, -1 for right-to-left
